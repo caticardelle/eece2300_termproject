@@ -68,7 +68,9 @@ def clean_data (df2):
     for column in df2:
         if df2.loc['Total_Stat_Count'][column] < (.90*num_rows):    #gets rows with more than 10% data points missing
             df2 = df2.drop([column],  axis=1)   #deletes rows
+    df2 = df2.drop(['Total_Stat_Count'], axis=0)
     return df2
+
 
 
 def select_attributes(list_attributes):
@@ -115,7 +117,7 @@ def main():
     df_attributes = label_data('C:\\Users\\catic\\Documents\\EECE 2300\\python\\crime_term_project\\data\\raw\\communities.attributes.txt', df2)
     #print(df_attributes)
     cleaned_df = clean_data(df_attributes)
-    #print (cleaned_df)
+    print (cleaned_df)
 
 if __name__ == '__main__':
     main()
