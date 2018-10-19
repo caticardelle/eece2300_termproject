@@ -1,6 +1,11 @@
+
 """
 Module for data handling. Specifically, Crime Dataset.
 """
+import pandas as pd
+import numpy as np
+
+
 
 def load_data(filename):
     """
@@ -8,7 +13,11 @@ def load_data(filename):
     :param filename: raw data
     :return: creates dataframe from raw data
     """
-    pass
+
+    df = pd.read_csv(filename, header=None)
+
+    return (df)
+
 
 
 def summarize_data (df) :
@@ -17,7 +26,21 @@ def summarize_data (df) :
     :param df: dataframe
     :return: new df with an additional row with coonts of missing values
     """
-    pass
+    count = 0
+    n_a = 0
+    df.loc['Total_Stat_Count'] = None
+    for col in range(0, len(df.columns)):
+        count = 0
+        n_a = 0
+        for row in range(0, len(df.index) - 1):
+            if df[col][row] == '?':
+                n_a = n_a + 1
+            else:
+                count = count + 1
+        df[col][row + 1] = count
+    return (df)
+
+
 
 def label_data (attributesfile, df):
     """
@@ -26,8 +49,14 @@ def label_data (attributesfile, df):
     :param df: dataframe with data
     :return: labeled dataframe
     """
-
-    pass
+    attributes = pd.read_csv(attributesfile, header=None)  #creates dataframe from attributes file
+    temp = pd.DataFrame()   #temporary dataframe to store attributes in
+    attribute = attributes[0].str.split(' ').str[1] #gets just the attribute name
+    temp[0] = attribute
+    temp = temp.transpose()
+    header = temp.iloc[0]   #gets the row of attributes from temp
+    labeled_df = df.rename(columns = header)    #sets the attributes as column labels
+    return(labeled_df)
 
 def clean_data (df2):
     """
@@ -35,7 +64,12 @@ def clean_data (df2):
     :param df2: summarized dataframe
     :return: cleaned df
     """
-    pass
+    num_rows = int(len(df2.index.values)-1) #gets number of attributes
+    for column in df2:
+        if df2.loc['Total_Stat_Count'][column] < (.90*num_rows):    #gets rows with more than 10% data points missing
+            df2 = df2.drop([column],  axis=1)   #deletes rows
+    return df2
+
 
 def select_attributes(list_attributes):
     """
@@ -73,4 +107,16 @@ def perf_eval (our_results, actual_results):
     pass
 
 
+def main():
+    df = load_data('C:\\Users\\catic\\Documents\\EECE 2300\\python\\crime_term_project\\data\\raw\\communities.data.txt')
+    #print (df)
+    df2 = summarize_data(df)
+    #print(df2)
+    df_attributes = label_data('C:\\Users\\catic\\Documents\\EECE 2300\\python\\crime_term_project\\data\\raw\\communities.attributes.txt', df2)
+    #print(df_attributes)
+    cleaned_df = clean_data(df_attributes)
+    #print (cleaned_df)
+
+if __name__ == '__main__':
+    main()
 
