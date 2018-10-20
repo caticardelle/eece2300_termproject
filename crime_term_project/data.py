@@ -117,7 +117,7 @@ def main():
     df_attributes = label_data('C:\\Users\\catic\\Documents\\EECE 2300\\python\\crime_term_project\\data\\raw\\communities.attributes.txt', df2)
     #print(df_attributes)
     cleaned_df = clean_data(df_attributes)
-    print (cleaned_df)
+    #print (cleaned_df)
 
 if __name__ == '__main__':
     main()
