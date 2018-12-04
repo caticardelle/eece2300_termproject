@@ -1,0 +1,105 @@
+import data
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.cross_validation import train_test_split
+from sklearn.linear_model import LinearRegression, Lasso, LassoCV, RidgeCV, ElasticNetCV
+from sklearn import metrics
+
+
+df = data.load_data('C:\\Users\\catic\\Documents\\EECE 2300\\python\\crime_term_project\\data\\raw\\communities.data.txt')
+df2 = data.summarize_data(df)
+df_attributes = data.label_data('C:\\Users\\catic\\Documents\\EECE 2300\\python\\crime_term_project\\data\\raw\\communities.attributes.txt', df2)
+cleaned_df = data.clean_data(df_attributes)
+cleaned_df = cleaned_df.replace('?', np.NaN)
+cleaned_df = cleaned_df.dropna(axis = 0)
+
+
+x = cleaned_df.drop(['communityname','ViolentCrimesPerPop'], axis = 1)
+y = cleaned_df['ViolentCrimesPerPop']
+train_x, test_x, train_y, test_y = train_test_split(x,y, test_size=.3, random_state=1)
+
+
+
+
+def linreg(x,y):
+    lm = LinearRegression()
+    lm.fit(train_x, train_y)
+    predict_test_lm = lm.predict(test_x)
+    plt.figure (figsize = (15,10))
+    MSE = metrics.mean_squared_error(test_y, predict_test_lm)
+    ft_importances_lm = pd.Series(lm.coef_, index = x.columns)
+    ft_importances_lm.plot(kind='barh')
+    plt.title("Linear Regression Coefficents \n Mean Squared Error = %f" % (MSE), fontsize = 18)
+    plt.xlim(-.6,.6)
+    plt.show();
+    print(metrics.mean_squared_error(test_y, predict_test_lm))
+
+
+def lassocv(x,y):
+    reg=LassoCV(cv=10, random_state=1).fit(x, y)     #fits the Lasso model to X and y and sets k fold
+    predictions = reg.predict(x)                        #predicts the target variable
+    MSE = metrics.mean_squared_error(y, predictions) #gets MSE from the true values and the predicted values
+    plt.figure (figsize = (15,10))
+    ft_importances_lm = pd.Series(reg.coef_, index = x.columns)
+    coefs = pd.Series(reg.coef_, index = x.columns)
+    absolute_coefs = abs(coefs)
+    top_coefs = absolute_coefs.sort_values(ascending=False).head(18)
+    ft_importances_lm.plot(kind='barh')
+    plt.title("Lasso Coefficents \n Mean Squared Error = %f" % (MSE), fontsize = 18)
+    plt.xlim(-.6, .6)
+    plt.show()
+    print(reg.alpha_)
+    print(MSE)
+    return list(top_coefs.index)
+
+
+def ridgecv(x,y):
+    reg=RidgeCV(cv=10).fit(x, y)     #fits the Lasso model to X and y and sets k fold
+    predictions = reg.predict(x)                        #predicts the target variable
+    MSE = metrics.mean_squared_error(y, predictions) #gets MSE from the true values and the predicted values
+    plt.figure (figsize = (15,10))
+    ft_importances_lm = pd.Series(reg.coef_, index = x.columns)
+    absolute_coefs = pd.Series(reg.coef_, index = x.columns)
+    print(absolute_coefs.sort_values(ascending=False))
+    ft_importances_lm.plot(kind='barh')
+    plt.title("Ridge Coefficents \n Mean Squared Error = %f" % (MSE), fontsize = 18)
+    plt.xlim(-.6, .6)
+    plt.show()
+    print(reg.alpha_)
+    print(MSE)
+
+
+def elasticnetcv(x, y):
+    reg = ElasticNetCV(cv=10, random_state=1).fit(x, y)  # fits the Lasso model to X and y and sets k fold
+    predictions = reg.predict(x)  # predicts the target variable
+    MSE = metrics.mean_squared_error(y, predictions)  # gets MSE from the true values and the predicted values
+    plt.figure(figsize=(15, 10))
+    ft_importances_lm = pd.Series(reg.coef_, index=x.columns)
+    absolute_coefs = pd.Series(reg.coef_, index=x.columns)
+    print(absolute_coefs.sort_values(ascending=False))
+    ft_importances_lm.plot(kind='barh')
+    plt.title("Elastic Net Coefficents \n Mean Squared Error = %f" %(MSE), fontsize = 18)
+    plt.xlim(-.6, .6)
+    plt.show()
+    print(reg.alpha_)
+    print(MSE)
+
+
+
+
+fig, ax = plt.subplots()
+#cleaned_df.plot.scatter(x='PctNotHSGrad', y='PctPopUnderPov', c = 'ViolentCrimesPerPop',
+                      #  colormap= 'jet', ax=ax)
+size = cleaned_df['racepctblack']*100
+cleaned_df.plot.scatter(x='PctIlleg', y='PctKids2Par', s=size, c='ViolentCrimesPerPop',
+                        colormap='Reds', ax=ax)
+plt.ylabel("Pct kids in family housing w/ two parents")
+plt.xlabel("Pct kids born to never married")
+
+
+#print(linreg(x,y))
+print(lassocv(x,y))
+#print(ridgecv(x,y))
+#print(elasticnetcv(x,y))
+
