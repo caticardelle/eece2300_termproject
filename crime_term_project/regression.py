@@ -39,7 +39,9 @@ def linreg(x,y):
     plt.figure(figsize=(15, 10))
     mse = metrics.mean_squared_error(test_y, predict_test_lm)
     ft_importances_lm = pd.Series(lm.coef_, index=x.columns)
-    ft_importances_lm.plot(kind='barh')
+    sorted_coefs = ft_importances_lm.sort_values()
+    print (sorted_coefs)
+    sorted_coefs.plot(kind='barh')
     plt.title("Linear Regression Coefficients \n Mean Squared Error = %f" % mse, fontsize=18)
     plt.xlim(-.6, .6)
     plt.show()
@@ -58,16 +60,15 @@ def lassocv(x, y):
     mse = metrics.mean_squared_error(y, predictions)
     plt.figure(figsize=(15, 10))
     coefs = pd.Series(reg.coef_, index=x.columns)
-    absolute_coefs = coefs.sort_values()
-    top_coefs = abs(absolute_coefs).sort_values(ascending=False).head(18)
-    absolute_coefs.plot(kind='barh')
+    sorted_coefs = coefs.sort_values()
+    top_coefs = abs(sorted_coefs).sort_values(ascending=False).head(80)
+    sorted_coefs.plot(kind='barh')
     plt.title("Lasso Coefficents \n Mean Squared Error = %f" % mse, fontsize=18)
     plt.xlim(-.6, .6)
     plt.show()
     print(reg.alpha_)
     print(mse)
     return list(top_coefs.index)
-    #return absolute_coefs.sort_values(ascending=False)
 
 
 def ridgecv(x, y):
@@ -104,9 +105,9 @@ def elasticnetcv(x, y):
     mse = metrics.mean_squared_error(y, predictions)  # gets MSE from the true values and the predicted values
     plt.figure(figsize=(15, 10))
     ft_importances_lm = pd.Series(reg.coef_, index=x.columns)
-    absolute_coefs = pd.Series(reg.coef_, index=x.columns)
-    print(absolute_coefs.sort_values(ascending=False))
-    ft_importances_lm.plot(kind='barh')
+    sorted_coefs = ft_importances_lm.sort_values()
+    print(sorted_coefs.sort_values(ascending=False))
+    sorted_coefs.plot(kind='barh')
     plt.title("Elastic Net Coefficents \n Mean Squared Error = %f" % mse, fontsize=18)
     plt.xlim(-.6, .6)
     plt.show()
@@ -116,21 +117,22 @@ def elasticnetcv(x, y):
 
 def visualization(topcoefs):
     """
+    Shows correlation between violent crimes and highest ranked attributes by lasso
 
     :param topcoefs:
     :return:
     """
     plt.subplot(221)
-    plt.scatter(cleaned_df.ix[:, topcoefs[0]], cleaned_df.ix[:, 'ViolentCrimesPerPop'])
+    plt.scatter(cleaned_df.ix[:, topcoefs[0]], cleaned_df.ix[:, 'ViolentCrimesPerPop'], color='red')
     plt.title(topcoefs[0])
     plt.subplot(222)
-    plt.scatter(cleaned_df.ix[:, topcoefs[1]], cleaned_df.ix[:, 'ViolentCrimesPerPop'])
+    plt.scatter(cleaned_df.ix[:, topcoefs[1]], cleaned_df.ix[:, 'ViolentCrimesPerPop'], color='red')
     plt.title(topcoefs[1])
     plt.subplot(223)
-    plt.scatter(cleaned_df.ix[:, topcoefs[2]], cleaned_df.ix[:, 'ViolentCrimesPerPop'])
+    plt.scatter(cleaned_df.ix[:, topcoefs[2]], cleaned_df.ix[:, 'ViolentCrimesPerPop'], color='red')
     plt.title(topcoefs[2])
     plt.subplot(224)
-    plt.scatter(cleaned_df.ix[:, topcoefs[3]], cleaned_df.ix[:, 'ViolentCrimesPerPop'])
+    plt.scatter(cleaned_df.ix[:, topcoefs[3]], cleaned_df.ix[:, 'ViolentCrimesPerPop'], color='red')
     plt.title(topcoefs[3])
     plt.show()
 

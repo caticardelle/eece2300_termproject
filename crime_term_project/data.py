@@ -76,49 +76,10 @@ def clean_data(df2):
     """
     num_rows = int(len(df2.index.values) - 1)  # gets number of attributes
     for column in df2:
-        if df2.loc['Total_Stat_Count'][column] < (.90 * num_rows):  # gets rows with more than 10% data points missing
+        if df2.loc['Total_Stat_Count'][column] < num_rows: #* .90):   gets rows with more than 10% data points missing
             df2 = df2.drop([column], axis=1)  # deletes rows
     df2 = df2.drop(['Total_Stat_Count'], axis=0)
     return df2
-
-
-def select_attributes(list_attributes):
-    """
-    Function to delete all unwanted attributes
-    :param list_attributes: list of attributes we want to analyze
-    :return: df with selected attributes
-    """
-    pass
-
-
-# potential fcn to delete rows with missing data points
-
-def decision_tree_model(df):
-    """
-    Function to call model on our dataframe and classifies cities
-    :param df: dataframe
-    :return: classified cities based on model
-    """
-    pass
-
-
-def naive_bayesian_model(df):
-    """
-       Function to call model on our dataframe and classifies cities
-       :param df: dataframe
-       :return: classifies cities based on model
-       """
-    pass
-
-
-def perf_eval(our_results, actual_results):
-    """
-    Function to compare our results to the original data
-    :param our_results: results from model
-    :param actual_results: results from original dataframe
-    :return: evaluation of the accuracy of the models
-    """
-    pass
 
 
 def main():
@@ -134,7 +95,10 @@ def main():
     cleaned_df = clean_data(df_attributes)
     old_labels = list(cleaned_df['state'].astype(np.int))
     new_labels = encode_labels(old_labels)
-    print (cleaned_df)
+    commname = cleaned_df.loc[:, ['state', 'communityname']]
+    grouped_state = commname.groupby('state')
+    print (commname.loc[commname['state'] == 7
+           ])
 
 
 if __name__ == '__main__':
